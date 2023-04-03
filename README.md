@@ -7,3 +7,8 @@ To Run:
 ```npm install```
 
 ```node babyai.js```
+
+More readme coming soon.
+
+Yohei's original python baby-ai for more info:
+https://github.com/yoheinakajima/babyagi
