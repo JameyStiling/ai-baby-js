@@ -1,0 +1,16 @@
+{
+  "name": "babyagi_js",
+  "version": "1.0.0",
+  "description": "Ai powered task management based on Yohei Nakajima's research",
+  "main": "babyai.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@pinecone-database/pinecone": "^0.0.12",
+    "openai": "^3.2.1"
+  }
+}
