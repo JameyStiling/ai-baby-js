@@ -6,8 +6,8 @@ const PINECONE_API_KEY = "";
 const PINECONE_ENVIRONMENT = "us-east4-gcp"; // Pinecone Environment (eg. "us-east1-gcp")
 
 // Set Variables
-const YOURTableName = "your-table";
-const OBJECTIVE = "solve the homeless problem in a random US city";
+const YOURTableName = "chicken-table";
+const OBJECTIVE = "Come up with a culturally relavent event plan in the Columbia River Gorge for this June";
 const YOUR_firstTask = "Develop a task list.";
 
 // Print OBJECTIVE
@@ -68,7 +68,7 @@ async function taskCreationAgent(objective, result, taskDescription, taskList) {
     presence_penalty: 0,
   });
   const newTasks = response.data.choices[0].text.trim().split("\n");
-  return newTasks.map((taskName) => ({ taskName }));
+  return newTasks.slice(1, -1).map((taskName) => ({ taskName: taskName.split('.').slice(1).join('.') }));
 }
 
 async function prioritizationAgent(thisTaskId) {
@@ -89,7 +89,7 @@ async function prioritizationAgent(thisTaskId) {
   });
   let newTasks = response.data.choices[0].text.trim().split("\n");
   for (let taskString of newTasks) {
-    let taskParts = taskString.trim().split(".", 1);
+    let taskParts = taskString.trim().split('.').slice(1).join('.');
     if (taskParts.length === 2) {
       let taskId = taskParts[0].trim();
       let taskName = taskParts[1].trim();
@@ -140,8 +140,8 @@ taskList.push(firstTask);
 let taskIDCounter = 1;
 
 // this has the power to stop it from taking over the world after certain amount of work
-// set to true and it can work for you forever tho :)
-let yeee = 10; 
+// it can work for you forever tho. :)
+let yeee = 13; 
 while (yeee) {
   yeee--;
 
@@ -158,6 +158,7 @@ while (yeee) {
     console.log(`${task.taskId}: ${task.taskName}`);
 
     // Send to execution function to complete the task based on the context
+    console.log('meeeeh', task.taskName)
     let result = await executionAgent(OBJECTIVE, task.taskName);
     let thisTaskID = parseInt(task.taskId);
     console.log(`*****TASK RESULT****`);
