@@ -7,7 +7,7 @@ const PINECONE_ENVIRONMENT = "us-east4-gcp"; // Pinecone Environment (eg. "us-ea
 
 // Set Variables
 const YOURTableName = "chicken-table";
-const OBJECTIVE = "Come up with a culturally relavent event plan in the Columbia River Gorge for this June";
+const OBJECTIVE = "Create a new video game plot about a lhasa apso saving the world from a new and unique enemy";
 const YOUR_firstTask = "Develop a task list.";
 
 // Print OBJECTIVE
@@ -98,9 +98,10 @@ async function prioritizationAgent(thisTaskId) {
   }
 }
 
-async function executionAgent(objective, task) {
+async function executionAgent(objective, task, donezo) {
   let context = await contextAgent(objective, YOURTableName, 5);
-  let prompt = `You are an AI who performs one task based on the following objective: ${objective}.\nTake into account these previously completed tasks: ${context}\nYour task: ${task}\nResponse:`;
+  const promptOverride = `You are an AI who will summarize your findings based on this objective: ${objective}.\nTake into account these previously completed tasks: ${context}\nProvide your final thoughts:`;
+  let prompt = donezo ? promptOverride : `You are an AI who performs one task based on the following objective: ${objective}.\nTake into account these previously completed tasks: ${context}\nExecute this task and provide a response: ${task}:`;
   let response = await openai.createCompletion({
     model: "text-davinci-003",
     prompt,
@@ -139,11 +140,9 @@ taskList.push(firstTask);
 // Main loop
 let taskIDCounter = 1;
 
-// this has the power to stop it from taking over the world after certain amount of work
-// it can work for you forever tho. :)
-let yeee = 13; 
-while (yeee) {
-  yeee--;
+// This is to Limit Tasks and Provide summary.
+let taskLimit = 10; 
+while (true) {
 
   if (taskList.length > 0) {
     // Print the task list
@@ -158,7 +157,6 @@ while (yeee) {
     console.log(`${task.taskId}: ${task.taskName}`);
 
     // Send to execution function to complete the task based on the context
-    console.log('meeeeh', task.taskName)
     let result = await executionAgent(OBJECTIVE, task.taskName);
     let thisTaskID = parseInt(task.taskId);
     console.log(`*****TASK RESULT****`);
@@ -195,6 +193,14 @@ while (yeee) {
       newTask.taskId = taskIDCounter;
       taskList.push(newTask);
     }
+
+    if (task.taskId === taskLimit) {
+      const finalSummary = await executionAgent(OBJECTIVE, task.taskName, true);
+      console.log(`*****SUMMARY****`);
+      console.log(finalSummary)
+      break;
+    }
+
     await prioritizationAgent(thisTaskID);
   }
   // Sleep before checking the task list again
