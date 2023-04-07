@@ -1,5 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
 import { PineconeClient } from "@pinecone-database/pinecone";
+
 // Set API Keys
 const OPENAI_API_KEY = "";
 const PINECONE_API_KEY = "";
@@ -14,7 +15,7 @@ const YOUR_firstTask = "Develop a task list.";
 console.log("*****OBJECTIVE*****");
 console.log(OBJECTIVE);
 
-// Configure OpenAI and Pinecone
+// Configure OpenAI and Pinecone API clients
 const configuration = new Configuration({
   apiKey: OPENAI_API_KEY,
 });
@@ -33,6 +34,7 @@ const metric = "cosine";
 const podType = "p1.x1";
 const pineconeIndexList = await pinecone.listIndexes();
 
+// Check if the index exists, otherwise create it
 if (!pineconeIndexList.includes(tableName)) {
   await pinecone.createIndex({
     createRequest: { name: tableName, dimension, metric, pod_type: podType },
@@ -45,6 +47,7 @@ const index = await pinecone.Index(tableName);
 // Task list
 const taskList = [];
 
+// Function to get text embeddings using OpenAI API
 async function getAdaEmbedding(text) {
   text = text.replace(/\n/g, " ");
   const embeddingResponse = await openai.createEmbedding({
@@ -54,6 +57,7 @@ async function getAdaEmbedding(text) {
   return embeddingResponse.data.data[0].embedding;
 }
 
+// Function to create new tasks based on the result of an execution agent
 async function taskCreationAgent(objective, result, taskDescription, taskList) {
   const prompt = `You are a task creation AI that uses the result of an execution agent to create new tasks with the following objective: ${objective}, The last completed task has the result: ${result}. This result was based on this task description: ${taskDescription}. These are incomplete tasks: ${taskList.join(
     ", "
@@ -70,6 +74,7 @@ async function taskCreationAgent(objective, result, taskDescription, taskList) {
   const newTasks = response.data.choices[0].text.trim().split("\n");
   return newTasks.slice(1, -1).map((taskName) => ({ taskName: taskName.split('.').slice(1).join('.') }));
 }
+
 
 async function prioritizationAgent(thisTaskId) {
   let taskNames = taskList.map((t) => t["taskName"]);
@@ -142,6 +147,7 @@ let taskIDCounter = 1;
 
 // This is to Limit Tasks and Provide summary.
 let taskLimit = 10; 
+
 while (true) {
 
   if (taskList.length > 0) {
