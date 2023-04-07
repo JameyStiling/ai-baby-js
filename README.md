@@ -8,7 +8,7 @@ To Run:
 
 ```node babyai.js```
 
-More readme coming soon.
+Find and change the `taskLimit` variable to tell the ai how many tasks to work through before summarizing
 
 Yohei's original python baby-ai for more info:
 https://github.com/yoheinakajima/babyagi
